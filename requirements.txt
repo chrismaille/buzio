@@ -1,0 +1,6 @@
+colorama
+unidecode
+Sphinx
+ipdb
+coverage
+wheel

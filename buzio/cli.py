@@ -89,7 +89,7 @@ class Console():
 
         return ret
 
-    def _print(self):
+    def _print(self, ask=False):
 
         if self.prefix:
             self.text = "{}: {}".format(self.prefix, self.text)
@@ -114,7 +114,7 @@ class Console():
                 for line in self.text.split("\n")
             ]
 
-        if not self.format_only:
+        if not self.format_only and not ask:
             print("\n".join(self.text))
 
         return self.text
@@ -255,7 +255,7 @@ class Console():
             )
             for text_line in self.text.split("\n")
         ]
-        self.text = "{}\n{}\n{}\n{}\n{}".format(
+        self.text = "{}\n{}\n{}\n{}\n{}\n".format(
             horizontal_line,
             vertical_line,
             "\n".join(main_texts),
@@ -376,3 +376,47 @@ class Console():
             raise ValueError("Theme must be a dict")
         for key in theme:
             self.theme_dict[key] = theme[key]
+
+    def ask(
+            self,
+            obj,
+            theme="warning",
+            transform=None,
+            humanize=True,
+            validator=None,
+            default=None,
+            required=False):
+        self.text = self._humanize(obj) if humanize else obj
+        self.theme = theme
+        self.transform = transform
+        self.prefix = None
+        self.text = "{}?{}".format(
+            self.text,
+            " [{}]: ".format(default) if default else " "
+        )
+        self.text = self._print(ask=True)
+
+        if self.format_only:
+            return self.text
+        else:
+            answered = False
+            try:
+                while not answered:
+                    data = input(self.text)
+                    if required and not data:
+                        text = self.text
+                        self.error("Valor obrigatório")
+                        self.text = text
+                    else:
+                        if validator:
+                            if not callable(validator):
+                                raise ValueError(
+                                    "Validator must be a function")
+                            text = self.text
+                            answered = validator(data)
+                            self.text = text
+                        else:
+                            answered = True
+                return data
+            except KeyboardInterrupt:
+                return False
