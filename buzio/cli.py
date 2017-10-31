@@ -89,7 +89,7 @@ class Console():
 
         return ret
 
-    def _print(self, ask=False):
+    def _print(self, linebreak=True):
 
         if self.prefix:
             self.text = "{}: {}".format(self.prefix, self.text)
@@ -114,8 +114,8 @@ class Console():
                 for line in self.text.split("\n")
             ]
 
-        if not self.format_only and not ask:
-            print("\n".join(self.text))
+        if not self.format_only:
+            print("\n".join(self.text), end="\n" if linebreak else "")
 
         return self.text
 
@@ -282,11 +282,11 @@ class Console():
         answered = False
         self.text = "\n{} (s/n) ".format(self.text)
         self.transform = transform
-        self._print()
+        self._print(linebreak=False)
         if self.format_only:
             return self.text
         while not answered:
-            ret = input(self.text)
+            ret = input("? ")
             if ret and ret[0].upper() in ["S", "N"]:
                 answered = True
         return ret[0].upper() == "S"
@@ -327,7 +327,7 @@ class Console():
                     answered = True
             except ValueError:
                 pass
-        return choices[ret]
+        return choices[int(ret) - 1]
 
     def unitext(self, obj, theme=None, transform=None, humanize=True):
         """
@@ -346,6 +346,13 @@ class Console():
         self.text = unidecode(self.text)
         return self._print()
 
+    def slugify(self, obj, humanize=True):
+        self.text = self._humanize(obj) if humanize else obj
+        self.text = unidecode(self.text)
+        self.text = self.text.strip().replace(" ", "_")
+        self.text = self.text.lower()
+        return self.text
+
     def progress(self, count, total, prefix='Lendo', theme=None,
                  suffix='Completo', barLength=50):
         """
@@ -362,9 +369,9 @@ class Console():
 
         return self.text
 
-    def add_theme(self, theme):
+    def load_theme(self, theme):
         """
-        Function: add_theme
+        Function: load_theme
         Summary: InsertHere
         Examples: InsertHere
         Attributes:
@@ -390,11 +397,11 @@ class Console():
         self.theme = theme
         self.transform = transform
         self.prefix = None
-        self.text = "{}?{}".format(
+        self.text = "{}{}".format(
             self.text,
             " [{}]: ".format(default) if default else " "
         )
-        self.text = self._print(ask=True)
+        self._print(linebreak=False)
 
         if self.format_only:
             return self.text
@@ -402,13 +409,13 @@ class Console():
             answered = False
             try:
                 while not answered:
-                    data = input(self.text)
-                    if required and not data:
+                    data = input("? ")
+                    if required and not data and not default:
                         text = self.text
                         self.error("Valor obrigatório")
                         self.text = text
                     else:
-                        if validator:
+                        if validator and data:
                             if not callable(validator):
                                 raise ValueError(
                                     "Validator must be a function")
@@ -417,6 +424,6 @@ class Console():
                             self.text = text
                         else:
                             answered = True
-                return data
+                return data if data else default
             except KeyboardInterrupt:
                 return False
