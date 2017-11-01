@@ -4,6 +4,7 @@
 [description]
 """
 from __future__ import print_function
+import os
 import sys
 import datetime
 import subprocess
@@ -41,7 +42,8 @@ class Console():
         'info': Fore.CYAN,
         'section': Fore.BLUE,
         'success': Fore.GREEN,
-        'warning': Fore.YELLOW
+        'warning': Fore.YELLOW,
+        'dark': Style.DIM
     }
 
     def __init__(self, format_only=False, theme_dict=DEFAULT_THEMES):
@@ -255,7 +257,7 @@ class Console():
             )
             for text_line in self.text.split("\n")
         ]
-        self.text = "{}\n{}\n{}\n{}\n{}\n".format(
+        self.text = "{}\n{}\n{}\n{}\n{}".format(
             horizontal_line,
             vertical_line,
             "\n".join(main_texts),
@@ -272,24 +274,36 @@ class Console():
             obj=None,
             theme="confirm",
             transform=None,
-            humanize=True):
+            humanize=True,
+            default=None):
         """
         """
+        if default is not None and not isinstance(default, bool):
+            raise ValueError("Default must be a boolean")
+
         if obj:
             self.text = self._humanize(obj) if humanize else obj
         else:
             self.text = "Por favor confirme"
         answered = False
-        self.text = "\n{} (s/n) ".format(self.text)
+        self.text = "{} (s/n){} ".format(
+            self.text,
+            "[{}]".format(self._humanize(default)[0])
+            if default is not None else "")
         self.transform = transform
+        self.prefix = None
+        self.theme = theme
         self._print(linebreak=False)
         if self.format_only:
             return self.text
         while not answered:
             ret = input("? ")
-            if ret and ret[0].upper() in ["S", "N"]:
+            if not ret and default is not None:
+                ret = default
                 answered = True
-        return ret[0].upper() == "S"
+            elif ret and ret[0].upper() in ["S", "N"]:
+                answered = True
+        return ret if isinstance(ret, bool) else ret[0].upper() == "S"
 
     def choose(
             self,
@@ -297,13 +311,27 @@ class Console():
             question=None,
             theme="choose",
             transform=None,
-            humanize=True):
+            humanize=True,
+            default=None):
         """
         """
         if not isinstance(choices, list):
             raise ValueError("Choices must be a list")
-        self.text = "\n"
+        if default:
+            found = [
+                num
+                for num, def_choice in enumerate(choices)
+                if def_choice == default
+            ]
+            if found:
+                default_index = found[0] + 1
+            else:
+                raise ValueError("Default object not found in choices")
+        else:
+            default_index = None
+
         i = 1
+        self.text = ""
         for choice in choices:
             self.text += "{}. {}\n".format(
                 i,
@@ -322,8 +350,16 @@ class Console():
         while not answered:
             try:
                 ret = input(
-                    "{} (1-{}): ".format(question, i - 1))
-                if ret and int(ret) in range(1, i):
+                    "{} (1-{}){}: ".format(
+                        question,
+                        i - 1,
+                        "[{}] ".format(default_index) if default_index else ""
+                    )
+                )
+                if not ret and default_index:
+                    ret = default_index
+                    answered = True
+                elif ret and int(ret) in range(1, i):
                     answered = True
             except ValueError:
                 pass
@@ -407,23 +443,90 @@ class Console():
             return self.text
         else:
             answered = False
-            try:
-                while not answered:
-                    data = input("? ")
-                    if required and not data and not default:
+            while not answered:
+                data = input("? ")
+                if required and not data and not default:
+                    text = self.text
+                    self.error("Valor obrigatório")
+                    self.text = text
+                else:
+                    if validator and data:
+                        if not callable(validator):
+                            raise ValueError(
+                                "Validator must be a function")
                         text = self.text
-                        self.error("Valor obrigatório")
+                        answered = validator(data)
                         self.text = text
                     else:
-                        if validator and data:
-                            if not callable(validator):
-                                raise ValueError(
-                                    "Validator must be a function")
-                            text = self.text
-                            answered = validator(data)
-                            self.text = text
-                        else:
-                            answered = True
-                return data if data else default
-            except KeyboardInterrupt:
-                return False
+                        answered = True
+            return data if data else default
+
+    def clear(self):
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+    def select(self,
+               obj,
+               theme="choose",
+               humanize=True,
+               question=None,
+               default=None):
+        if not isinstance(obj, list):
+            raise ValueError("select data must be a list")
+        if default is not None:
+            try:
+                obj[default]
+            except (ValueError, IndexError):
+                raise ValueError("Select default not valid")
+        options = [
+            self._humanize(item) if humanize else item
+            for item in obj
+        ]
+        phrases = []
+        letters = []
+        for opt in options:
+            letter, phrase = self._get_letter(
+                text=opt,
+                optlist=letters
+            )
+            phrases.append(phrase)
+            letters.append(letter)
+
+        answered = False
+        self.theme = theme
+        self.transform = None
+        self.prefix = False
+        self.text = "{}: {}{}".format(
+            question if question else "Selecione",
+            ", ".join([text for text in phrases]),
+            " [{}]".format(obj[default]) if default is not None else ""
+        )
+        self._print(linebreak=False)
+        if self.format_only:
+            return self.text
+        while not answered:
+            ret = input("? ")
+            if not ret and default is not None:
+                return default
+            elif ret and ret.upper() in letters:
+                answered = True
+        return [
+            index
+            for index, data in enumerate(letters)
+            if ret.upper() == data
+        ][0]
+
+    def _get_letter(self, text, index=0, optlist=[]):
+        try:
+            test_letter = text[index].upper()
+        except IndexError:
+            raise ValueError("Can not found letter for {} option".format(text))
+        if test_letter in optlist:
+            index += 1
+            test_letter, new_text = self._get_letter(text, index, optlist)
+        else:
+            new_text = "{}({}){}".format(
+                text[:index] if index > 0 else "",
+                test_letter,
+                text[index + 1:]
+            )
+        return test_letter, new_text
