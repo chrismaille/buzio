@@ -1,22 +1,48 @@
 # -*- coding: utf-8 -*-
-"""[summary]
+"""Buzio main code.
 
-[description]
+Return
+------
+    console (obj) = Console instance
+    formatStr (obj) = Console instance with format_only=True
 """
 from __future__ import print_function
-import os
-import sys
 import datetime
+import gettext
+import os
+import platform
 import subprocess
+import sys
 from colorama import Fore, Style
 from unidecode import unidecode
 
+args = {
+    'domain': 'messages',
+    'localedir': os.path.join('..', 'locale'),
+    'fallback': True
+}
+
+t = gettext.translation(**args)
+_ = t.gettext
+
 
 def get_terminal_size():
+    """Function: get_terminal_size.
+
+    Try to find terminal size using get_terminal_size
+    on Python 3 and 'tput' commands for Python 2.
+    Limited use on Windows: just returns (80, 25)
+
+    Return
+    ------
+        Tuple of Int: (col, lines)
+    """
     try:
         from shutil import get_terminal_size
         return get_terminal_size(fallback=(80, 24))
     except ImportError:
+        if platform.system() == "Windows":
+            return (80, 25)
         cols = int(subprocess.check_output(
             'tput cols',
             shell=True,
@@ -31,16 +57,25 @@ def get_terminal_size():
 
 
 class Console():
-    """
+    """Console class.
+    
+    Attributes:
+        DEFAULT_THEMES (Dict): Default color theme
+        format_only (bool): Print or format string only
+        prefix (bool): Append prefix on text?
+        text (str): text to be formatted/printed
+        theme (str): theme selected for print/format
+        theme_dict (dict): theme dictionary loaded
+        transform (str): keywords for transform text
     """
 
     DEFAULT_THEMES = {
         'box': Fore.CYAN,
-        'choose': Fore.BLUE,
-        'confirm': Fore.MAGENTA,
+        'choose': Fore.LIGHTYELLOW_EX,
+        'confirm': Fore.LIGHTMAGENTA_EX,
         'error': Fore.RED,
         'info': Fore.CYAN,
-        'section': Fore.BLUE,
+        'section': Fore.LIGHTYELLOW_EX,
         'success': Fore.GREEN,
         'warning': Fore.YELLOW,
         'dark': Style.DIM
@@ -51,28 +86,46 @@ class Console():
         Function: __init__
         Summary: InsertHere
         Examples: InsertHere
+
         Attributes:
-            @param (self):InsertHere
-            @param (format_only) default=False: InsertHere
-            @param (theme_dict) default=DEFAULT_THEMES: InsertHere
-        Returns: InsertHere
+            Returns: InsertHere
+
+        Args:
+            format_only (bool, optional): Description
+            theme_dict (TYPE, optional): Description
         """
         self.format_only = format_only
         self.theme_dict = theme_dict
 
     def _get_style(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+
+        Raises:
+            ValueError: Description
+        """
         if not isinstance(self.theme_dict, dict):
             raise ValueError("Themes List must be a dictionary.")
 
         return self.theme_dict.get(self.theme, "")
 
     def _humanize(self, obj):
+        """Summary
+
+        Args:
+            obj (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if obj is None:
             ret = "--"
         elif isinstance(obj, str):
             ret = obj
         elif isinstance(obj, bool):
-            ret = "Sim" if obj else "Não"
+            ret = _("Yes") if obj else _("No")
         elif isinstance(obj,
                         (datetime.datetime, datetime.date, datetime.time)):
             ret = obj.isoformat()
@@ -92,7 +145,14 @@ class Console():
         return ret
 
     def _print(self, linebreak=True):
+        """Summary
 
+        Args:
+            linebreak (bool, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
         if self.prefix:
             self.text = "{}: {}".format(self.prefix, self.text)
 
@@ -130,6 +190,16 @@ class Console():
             prefix="Success",
             humanize=True):
         """
+        Args:
+            obj (TYPE): Description
+            theme (str, optional): Description
+            transform (None, optional): Description
+            use_prefix (bool, optional): Description
+            prefix (str, optional): Description
+            humanize (bool, optional): Description
+
+        Returns:
+            TYPE: Description
         """
         self.text = self._humanize(obj) if humanize else obj
         self.prefix = prefix if use_prefix else ""
@@ -146,6 +216,16 @@ class Console():
             prefix="Info",
             humanize=True):
         """
+        Args:
+            obj (TYPE): Description
+            theme (str, optional): Description
+            transform (None, optional): Description
+            use_prefix (bool, optional): Description
+            prefix (str, optional): Description
+            humanize (bool, optional): Description
+
+        Returns:
+            TYPE: Description
         """
         self.text = self._humanize(obj) if humanize else obj
         self.prefix = prefix if use_prefix else ""
@@ -162,6 +242,16 @@ class Console():
             prefix="Warning",
             humanize=True):
         """
+        Args:
+            obj (TYPE): Description
+            theme (str, optional): Description
+            transform (None, optional): Description
+            use_prefix (bool, optional): Description
+            prefix (str, optional): Description
+            humanize (bool, optional): Description
+
+        Returns:
+            TYPE: Description
         """
         self.text = self._humanize(obj) if humanize else obj
         self.prefix = prefix if use_prefix else ""
@@ -178,6 +268,16 @@ class Console():
             prefix="Error",
             humanize=True):
         """
+        Args:
+            obj (TYPE): Description
+            theme (str, optional): Description
+            transform (None, optional): Description
+            use_prefix (bool, optional): Description
+            prefix (str, optional): Description
+            humanize (bool, optional): Description
+
+        Returns:
+            TYPE: Description
         """
         self.text = self._humanize(obj) if humanize else obj
         self.prefix = prefix if use_prefix else ""
@@ -195,6 +295,17 @@ class Console():
             full_width=False,
             humanize=True):
         """
+        Args:
+            obj (TYPE): Description
+            theme (str, optional): Description
+            transform (None, optional): Description
+            use_prefix (bool, optional): Description
+            prefix (str, optional): Description
+            full_width (bool, optional): Description
+            humanize (bool, optional): Description
+
+        Returns:
+            TYPE: Description
         """
         self.text = self._humanize(obj) if humanize else obj
         if transform and 'center' in transform:
@@ -233,13 +344,18 @@ class Console():
         Function: box
         Summary: InsertHere
         Examples: InsertHere
+
         Attributes:
-            @param (self):InsertHere
-            @param (obj):InsertHere
-            @param (theme) default="box": InsertHere
-            @param (transform) default=None: InsertHere
-            @param (humanize) default=True: InsertHere
-        Returns: InsertHere
+            Returns: InsertHere
+
+        Args:
+            obj (TYPE): Description
+            theme (str, optional): Description
+            transform (None, optional): Description
+            humanize (bool, optional): Description
+
+        Returns:
+            TYPE: Description
         """
         self.text = self._humanize(obj) if humanize else obj
         line_sizes = [
@@ -277,6 +393,18 @@ class Console():
             humanize=True,
             default=None):
         """
+        Args:
+            obj (None, optional): Description
+            theme (str, optional): Description
+            transform (None, optional): Description
+            humanize (bool, optional): Description
+            default (None, optional): Description
+
+        Returns:
+            TYPE: Description
+
+        Raises:
+            ValueError: Description
         """
         if default is not None and not isinstance(default, bool):
             raise ValueError("Default must be a boolean")
@@ -284,10 +412,11 @@ class Console():
         if obj:
             self.text = self._humanize(obj) if humanize else obj
         else:
-            self.text = "Por favor confirme"
+            self.text = _("Please confirm")
         answered = False
-        self.text = "{} (s/n){} ".format(
+        self.text = "{} {}{} ".format(
             self.text,
+            _("(y/n)"),
             "[{}]".format(self._humanize(default)[0])
             if default is not None else "")
         self.transform = transform
@@ -297,13 +426,15 @@ class Console():
         if self.format_only:
             return self.text
         while not answered:
-            ret = input("? ")
+            ret = input(_("? "))
             if not ret and default is not None:
                 ret = default
                 answered = True
-            elif ret and ret[0].upper() in ["S", "N"]:
+            elif ret and ret[0].upper() in \
+                    [_("Yes")[0].upper(), _("No")[0].upper()]:
                 answered = True
-        return ret if isinstance(ret, bool) else ret[0].upper() == "S"
+        return ret if isinstance(
+            ret, bool) else ret[0].upper() == _("Yes")[0].upper()
 
     def choose(
             self,
@@ -314,6 +445,19 @@ class Console():
             humanize=True,
             default=None):
         """
+        Args:
+            choices (TYPE): Description
+            question (None, optional): Description
+            theme (str, optional): Description
+            transform (None, optional): Description
+            humanize (bool, optional): Description
+            default (None, optional): Description
+
+        Returns:
+            TYPE: Description
+
+        Raises:
+            ValueError: Description
         """
         if not isinstance(choices, list):
             raise ValueError("Choices must be a list")
@@ -346,7 +490,7 @@ class Console():
         if self.format_only:
             return self.text
         if not question:
-            question = "Selecione"
+            question = _("Select")
         while not answered:
             try:
                 ret = input(
@@ -370,28 +514,52 @@ class Console():
         Function: unitext
         Summary: InsertHere
         Examples: InsertHere
+
         Attributes:
-            @param (self):InsertHere
-            @param (obj):InsertHere
-            @param (theme) default=None: InsertHere
-            @param (transform) default=None: InsertHere
-            @param (humanize) default=True: InsertHere
-        Returns: InsertHere
+            Returns: InsertHere
+
+        Args:
+            obj (TYPE): Description
+            theme (None, optional): Description
+            transform (None, optional): Description
+            humanize (bool, optional): Description
+
+        Returns:
+            TYPE: Description
         """
         self.text = self._humanize(obj) if humanize else obj
         self.text = unidecode(self.text)
         return self._print()
 
     def slugify(self, obj, humanize=True):
+        """Summary
+
+        Args:
+            obj (TYPE): Description
+            humanize (bool, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.text = self._humanize(obj) if humanize else obj
         self.text = unidecode(self.text)
         self.text = self.text.strip().replace(" ", "_")
         self.text = self.text.lower()
         return self.text
 
-    def progress(self, count, total, prefix='Lendo', theme=None,
-                 suffix='Completo', barLength=50):
+    def progress(self, count, total, prefix=_('Reading'), theme=None,
+                 suffix=_('Complete'), barLength=50):
         """
+        Args:
+            count (TYPE): Description
+            total (TYPE): Description
+            prefix (str, optional): Description
+            theme (None, optional): Description
+            suffix (str, optional): Description
+            barLength (int, optional): Description
+
+        Returns:
+            TYPE: Description
         """
         formatStr = "{0:.2f}"
         percents = formatStr.format(100 * (count / float(total)))
@@ -410,10 +578,15 @@ class Console():
         Function: load_theme
         Summary: InsertHere
         Examples: InsertHere
+
         Attributes:
-            @param (self):InsertHere
-            @param (theme):InsertHere
-        Returns: InsertHere
+            Returns: InsertHere
+
+        Args:
+            theme (TYPE): Description
+
+        Raises:
+            ValueError: Description
         """
         if not isinstance(theme, dict):
             raise ValueError("Theme must be a dict")
@@ -429,6 +602,23 @@ class Console():
             validator=None,
             default=None,
             required=False):
+        """Summary
+
+        Args:
+            obj (TYPE): Description
+            theme (str, optional): Description
+            transform (None, optional): Description
+            humanize (bool, optional): Description
+            validator (None, optional): Description
+            default (None, optional): Description
+            required (bool, optional): Description
+
+        Returns:
+            TYPE: Description
+
+        Raises:
+            ValueError: Description
+        """
         self.text = self._humanize(obj) if humanize else obj
         self.theme = theme
         self.transform = transform
@@ -447,7 +637,7 @@ class Console():
                 data = input("? ")
                 if required and not data and not default:
                     text = self.text
-                    self.error("Valor obrigatório")
+                    self.error(_("Value required"))
                     self.text = text
                 else:
                     if validator and data:
@@ -462,6 +652,7 @@ class Console():
             return data if data else default
 
     def clear(self):
+        """Clear terminal."""
         os.system('cls' if os.name == 'nt' else 'clear')
 
     def select(self,
@@ -470,6 +661,21 @@ class Console():
                humanize=True,
                question=None,
                default=None):
+        """Summary
+
+        Args:
+            obj (TYPE): Description
+            theme (str, optional): Description
+            humanize (bool, optional): Description
+            question (None, optional): Description
+            default (None, optional): Description
+
+        Returns:
+            TYPE: Description
+
+        Raises:
+            ValueError: Description
+        """
         if not isinstance(obj, list):
             raise ValueError("select data must be a list")
         if default is not None:
@@ -496,7 +702,7 @@ class Console():
         self.transform = None
         self.prefix = False
         self.text = "{}: {}{}".format(
-            question if question else "Selecione",
+            question if question else _("Select"),
             ", ".join([text for text in phrases]),
             " [{}]".format(obj[default]) if default is not None else ""
         )
@@ -516,6 +722,19 @@ class Console():
         ][0]
 
     def _get_letter(self, text, index=0, optlist=[]):
+        """Summary
+
+        Args:
+            text (TYPE): Description
+            index (int, optional): Description
+            optlist (list, optional): Description
+
+        Returns:
+            TYPE: Description
+
+        Raises:
+            ValueError: Description
+        """
         try:
             test_letter = text[index].upper()
         except IndexError:
