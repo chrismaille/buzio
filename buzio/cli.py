@@ -529,6 +529,9 @@ class Console():
         """
         self.text = self._humanize(obj) if humanize else obj
         self.text = unidecode(self.text)
+        self.theme = theme
+        self.transform = transform
+        self.prefix = False
         return self._print()
 
     def slugify(self, obj, humanize=True):
