@@ -179,7 +179,8 @@ class Console():
         if not self.format_only:
             print("\n".join(self.text), end="\n" if linebreak else "")
 
-        return self.text
+        string = "{}".format("\n" if linebreak else "")
+        return string.join(self.text)
 
     def success(
             self,
