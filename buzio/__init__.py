@@ -13,7 +13,7 @@ from buzio.cli import Console
 
 init()
 
-__version__ = "1.0"
+__version__ = "1.0.1"
 
 console = Console()
 formatStr = Console(format_only=True)

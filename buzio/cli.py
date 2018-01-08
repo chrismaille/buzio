@@ -78,7 +78,7 @@ class Console():
         'section': Fore.LIGHTYELLOW_EX,
         'success': Fore.GREEN,
         'warning': Fore.YELLOW,
-        'dark': Style.DIM
+        'dark': Fore.WHITE + Style.DIM
     }
 
     def __init__(self, format_only=False, theme_dict=DEFAULT_THEMES):
