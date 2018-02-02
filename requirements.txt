@@ -4,3 +4,6 @@ Sphinx
 ipdb
 coverage
 wheel
+sphinx-rtd-theme
+python-coveralls
+ipdbplugin
