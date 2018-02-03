@@ -6,6 +6,18 @@
 Welcome to Buzio's documentation!
 =================================
 
+.. image:: https://img.shields.io/pypi/v/nine.svg
+   :target: https://pypi.python.org/pypi/buzio
+.. image:: https://travis-ci.org/chrismaille/buzio.svg?branch=master
+    :target: https://travis-ci.org/chrismaille/buzio
+.. image:: https://img.shields.io/pypi/pyversions/buzio.svg
+   :target: https://pypi.python.org/pypi/buzio
+.. image:: https://coveralls.io/repos/github/chrismaille/buzio/badge.svg?branch=master
+	:target: https://coveralls.io/github/chrismaille/buzio?branch=master
+.. image:: https://readthedocs.org/projects/buzio/badge/?version=latest
+	:target: http://buzio.readthedocs.io/en/latest/?badge=latest
+	:alt: Documentation Status
+
 This document will guide you how to install, configure and use Buzio_ in your projects.
 
 What is Buzio?
@@ -16,7 +28,7 @@ Buzio_ is a python library tool for printing formatted text in terminal, similar
 Generate fancy formats
 ......................
 
-"Section" example 1:
+**"Section" example 1**:
 
 .. code-block:: python
 
@@ -29,7 +41,7 @@ Terminal output::
 	$ >> First Section
 	$ ----------------
 
-"Section" example 2:
+**"Section" example 2:**
 
 .. code-block:: python
 
@@ -76,7 +88,7 @@ Ask for Input data
 
 You can use Buzio_ to automatically generate "choose" and "select" questions, based on Python objects:
 
-"Choose" example:
+**"Choose" example:**
 
 .. code-block:: python
 
@@ -98,7 +110,7 @@ Terminal output::
 	$ 
 	$ Select (1-3): ?
 
-"Select" example:
+**"Select" example:**
 
 .. code-block:: python
 
@@ -117,7 +129,7 @@ Terminal output::
 	$ Select: (S)ave and Exit, S(A)ve, (C)ancel? 
 
 
-You can also "ask" a question and use a method to validate the answer:
+You can also "ask" a question and, optionally, use a method to validate the answer:
 
 .. code-block:: python
 
@@ -135,6 +147,17 @@ Terminal output::
 	$ Please answer again: 4
 	$ Thanks!
 
+Run terminal commands
+.....................
+
+You can use Buzio_ to run terminal commands (using Python ``subprocess``) and get the *stdout* result::
+
+	>>> from buzio import console
+	>>> ret = console.run("echo HelloWorld!", get_stdout=True, verbose=True)
+	Cmd: echo HelloWorld!
+	>>> print(ret)
+	HelloWorld!
+	
 
 .. toctree::
    :maxdepth: 2

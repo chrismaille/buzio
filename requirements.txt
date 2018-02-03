@@ -7,3 +7,4 @@ wheel
 sphinx-rtd-theme
 python-coveralls
 ipdbplugin
+mock

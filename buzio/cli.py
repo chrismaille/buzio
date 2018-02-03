@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """Buzio main code.
 
+This is the main code for Buzio Package
+It contains the Console class.
+
 Return
 ------
-    console (obj) = Console instance
-    formatStr (obj) = Console instance with format_only=True
+    * console (obj) = Console instance
+    * formatStr (obj) = Console instance with format_only=True
 """
 from __future__ import print_function
 import datetime
@@ -58,7 +61,7 @@ def get_terminal_size():
 
 class Console():
     """Console class.
-    
+
     Attributes:
         DEFAULT_THEMES (Dict): Default color theme
         format_only (bool): Print or format string only
@@ -81,7 +84,9 @@ class Console():
         'dark': Fore.WHITE + Style.DIM
     }
 
-    def __init__(self, format_only=False, theme_dict=DEFAULT_THEMES):
+    def __init__(self, format_only=False, default_prefix="",
+                 default_transform="", default_theme="",
+                 theme_dict=DEFAULT_THEMES):
         """
         Function: __init__
         Summary: InsertHere
@@ -96,6 +101,9 @@ class Console():
         """
         self.format_only = format_only
         self.theme_dict = theme_dict
+        self.transform = default_transform
+        self.theme = default_theme
+        self.prefix = default_prefix
 
     def _get_style(self):
         """Summary
@@ -141,7 +149,11 @@ class Console():
         elif isinstance(obj, dict):
             if kwargs.pop('show_counters', False):
                 ret = "\n".join([
-                    "({}) {}: {}".format(i + 1, key, self._humanize(obj[key], **kwargs))
+                    "({}) {}: {}".format(
+                        i + 1,
+                        key,
+                        self._humanize(obj[key], **kwargs)
+                    )
                     for i, key in enumerate(obj)
                 ])
                 ret = "\n".join([
@@ -158,14 +170,18 @@ class Console():
 
         return ret
 
-    def _print(self, linebreak=True):
+    def _print(self, linebreak=False):
         """Summary
 
-        Args:
-            linebreak (bool, optional): Description
+        Parameters
+        ----------
+        linebreak : bool, optional
+            Description
 
-        Returns:
-            TYPE: Description
+        Returns
+        -------
+        TYPE
+            Description
         """
         if self.prefix:
             self.text = "{}: {}".format(self.prefix, self.text)
@@ -531,7 +547,8 @@ class Console():
                 pass
         return choices[int(ret) - 1]
 
-    def unitext(self, obj, theme=None, transform=None, humanize=True, **kwargs):
+    def unitext(self, obj, theme=None, transform=None,
+                humanize=True, **kwargs):
         """
         Function: unitext
         Summary: InsertHere
@@ -550,6 +567,8 @@ class Console():
             TYPE: Description
         """
         self.text = self._humanize(obj, **kwargs) if humanize else obj
+        if hasattr(str, 'decode'):
+            self.text = self.text.decode("utf-8")
         self.text = unidecode(self.text)
         self.theme = theme
         self.transform = transform
@@ -567,6 +586,8 @@ class Console():
             TYPE: Description
         """
         self.text = self._humanize(obj, **kwargs) if humanize else obj
+        if hasattr(str, 'decode'):
+            self.text = self.text.decode("utf-8")
         self.text = unidecode(self.text)
         self.text = self.text.strip().replace(" ", "_")
         self.text = self.text.lower()
@@ -779,3 +800,70 @@ class Console():
                 text[index + 1:]
             )
         return test_letter, new_text
+
+    def run(
+            self,
+            task,
+            title=None,
+            get_stdout=False,
+            run_stdout=False,
+            verbose=False,
+            silent=False,
+            use_prefix=True,
+            prefix="Cmd"):
+        """Run command in subprocess.
+
+        Args:
+            task (string): command to run
+            title (string, optional): title to be printed
+            get_stdout (bool, optional): return stdout from command
+            run_stdout (bool, optional): run stdout before command
+            verbose (bool, optional): show command in terminal
+            silent (bool, optional): occult stdout/stderr when running command
+
+        Return
+        ------
+            Bool or String: Task success or Task stdout
+
+        """
+        if title:
+            self.section(title)
+
+        try:
+            if run_stdout:
+                if verbose:
+                    self.info(task, use_prefix=use_prefix, prefix=prefix)
+                command = subprocess.check_output(task, shell=True)
+
+                if not command:
+                    print('An error occur. Task aborted.')
+                    return False
+
+                if verbose:
+                    self.info(command, use_prefix=use_prefix, prefix=prefix)
+                ret = subprocess.call(command, shell=True)
+
+            elif get_stdout is True:
+                if verbose:
+                    self.info(task, use_prefix=use_prefix, prefix=prefix)
+                ret = subprocess.check_output(task, shell=True)
+            else:
+                if verbose:
+                    self.info(task, use_prefix=use_prefix, prefix=prefix)
+                ret = subprocess.call(
+                    task if not silent else
+                    "{} >/dev/null".format(task),
+                    shell=True,
+                    stderr=subprocess.STDOUT)
+
+            if ret != 0 and not get_stdout:
+                return False
+        except BaseException:
+            return False
+
+        try:
+            ret = ret.decode('utf-8')
+        except AttributeError:
+            pass
+
+        return True if not get_stdout else ret
