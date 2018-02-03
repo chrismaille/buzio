@@ -1,3 +1,8 @@
+.. Buzio documentation master file, created by
+   sphinx-quickstart on Fri Oct 27 10:56:33 2017.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
 Welcome to Buzio's documentation!
 =================================
 
@@ -13,44 +18,12 @@ Welcome to Buzio's documentation!
 	:target: http://buzio.readthedocs.io/en/latest/?badge=latest
 	:alt: Documentation Status
 
-* Read the Docs: http://buzio.readthedocs.io/
-* Source Code: https://github.com/chrismaille/buzio
+This document will guide you how to install, configure and use Buzio_ in your projects.
 
-Buzio_ is a python library tool for printing formatted text in terminal, similar to termcolor_ or colored_.
+What is Buzio?
+---------------
 
-Installing Buzio
------------------
-
-Install Buzio using the command::
-
-    $ pip install buzio
-
-Importing the Library
----------------------
-
-.. code-block:: python
-
-    from buzio import console, formatStr
-
-The ``console`` is a instance of the ``Console`` class initialized with default color themes. You can also import the class and instantiate with your own settings (See the :doc:reference for more info)
-
-The ``formatStr`` is also a instance of the ``Console`` class too, but instead of printing in terminal the message, this instance just return the formatted text.
-
-The default color themes
-++++++++++++++++++++++++
-
-=================== =======================
-Method              Text Color
-=================== =======================
-console.box         Fore.CYAN
-console.error       Fore.RED
-console.info        Fore.CYAN
-console.section     Fore.LIGHTYELLOW_EX
-console.success     Fore.GREEN
-console.warning     Fore.YELLOW
-=================== =======================
-
-These colors are based in colorama_ constants.
+Buzio_ is a python library tool for printing formatted text in terminal, similar to termcolor_ or colored_. But unlike these, Buzio_ has some new features like:
 
 Generate fancy formats
 ......................
@@ -67,6 +40,20 @@ Terminal output::
 
 	$ >> First Section
 	$ ----------------
+
+**"Section" example 2:**
+
+.. code-block:: python
+
+	from buzio import console
+
+	console.section("Main Section", full_width=True, transform="upper center")
+
+Terminal output::
+
+	$ >                                 MAIN SECTION                                 <
+	$ --------------------------------------------------------------------------------
+
 
 Humanize Python objects
 .......................
@@ -123,6 +110,43 @@ Terminal output::
 	$ 
 	$ Select (1-3): ?
 
+**"Select" example:**
+
+.. code-block:: python
+
+	from buzio import console
+
+	my_options = [
+		"Save",
+		"Save and Exit",
+		"Cancel"
+	]
+
+	console.select(my_options)
+
+Terminal output::
+
+	$ Select: (S)ave and Exit, S(A)ve, (C)ancel? 
+
+
+You can also "ask" a question and, optionally, use a method to validate the answer:
+
+.. code-block:: python
+
+	from buzio import console
+
+	def check_answer(answer):
+	   return int(answer) == 4
+
+	console.ask("What is the sum of 2+2", validator=check_answer)
+	print("Thanks!")
+
+Terminal output::
+
+	$ What is the sum of 2+2? : 3
+	$ Please answer again: 4
+	$ Thanks!
+
 Run terminal commands
 .....................
 
@@ -133,13 +157,22 @@ You can use Buzio_ to run terminal commands (using Python ``subprocess``) and ge
 	Cmd: echo HelloWorld!
 	>>> print(ret)
 	HelloWorld!
+	
 
-Further reading
----------------
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
-Please check full documentation in http://buzio.readthedocs.io/
+   tutorial
+   reference
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
 .. _Buzio: https://github.com/chrismaille/buzio
 .. _colored: https://pypi.python.org/pypi/colored
 .. _termcolor: https://pypi.python.org/pypi/termcolor
-.. _colorama: https://pypi.python.org/pypi/colorama

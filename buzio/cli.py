@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """Buzio main code.
 
+This is the main code for Buzio Package
+It contains the Console class.
+
 Return
 ------
-    console (obj) = Console instance
-    formatStr (obj) = Console instance with format_only=True
+    * console (obj) = Console instance
+    * formatStr (obj) = Console instance with format_only=True
 """
 from __future__ import print_function
 import datetime
@@ -58,7 +61,7 @@ def get_terminal_size():
 
 class Console():
     """Console class.
-    
+
     Attributes:
         DEFAULT_THEMES (Dict): Default color theme
         format_only (bool): Print or format string only
@@ -81,7 +84,9 @@ class Console():
         'dark': Fore.WHITE + Style.DIM
     }
 
-    def __init__(self, format_only=False, theme_dict=DEFAULT_THEMES):
+    def __init__(self, format_only=False, default_prefix="",
+                 default_transform="", default_theme="",
+                 theme_dict=DEFAULT_THEMES):
         """
         Function: __init__
         Summary: InsertHere
@@ -96,6 +101,9 @@ class Console():
         """
         self.format_only = format_only
         self.theme_dict = theme_dict
+        self.transform = default_transform
+        self.theme = default_theme
+        self.prefix = default_prefix
 
     def _get_style(self):
         """Summary
@@ -111,7 +119,7 @@ class Console():
 
         return self.theme_dict.get(self.theme, "")
 
-    def _humanize(self, obj):
+    def _humanize(self, obj, **kwargs):
         """Summary
 
         Args:
@@ -128,30 +136,48 @@ class Console():
             ret = _("Yes") if obj else _("No")
         elif isinstance(obj,
                         (datetime.datetime, datetime.date, datetime.time)):
-            ret = obj.isoformat()
+            date_format = kwargs.pop("date_format", False)
+            if date_format:
+                ret = obj.strftime(date_format)
+            else:
+                ret = obj.isoformat()
         elif isinstance(obj, list) or isinstance(obj, tuple):
             ret = ", ".join([
-                self._humanize(data)
+                self._humanize(data, **kwargs)
                 for data in obj
             ])
         elif isinstance(obj, dict):
-            ret = "\n".join([
-                "({}) {}: {}".format(i + 1, key, self._humanize(obj[key]))
-                for i, key in enumerate(obj)
-            ])
+            if kwargs.pop('show_counters', False):
+                ret = "\n".join([
+                    "({}) {}: {}".format(
+                        i + 1,
+                        key,
+                        self._humanize(obj[key], **kwargs)
+                    )
+                    for i, key in enumerate(obj)
+                ])
+            else:
+                ret = "\n".join([
+                    "{}: {}".format(key, self._humanize(obj[key], **kwargs))
+                    for key in obj
+                ])
         else:
             ret = str(obj)
 
         return ret
 
-    def _print(self, linebreak=True):
+    def _print(self, linebreak=False):
         """Summary
 
-        Args:
-            linebreak (bool, optional): Description
+        Parameters
+        ----------
+        linebreak : bool, optional
+            Description
 
-        Returns:
-            TYPE: Description
+        Returns
+        -------
+        TYPE
+            Description
         """
         if self.prefix:
             self.text = "{}: {}".format(self.prefix, self.text)
@@ -189,7 +215,8 @@ class Console():
             transform=None,
             use_prefix=True,
             prefix="Success",
-            humanize=True):
+            humanize=True,
+            **kwargs):
         """
         Args:
             obj (TYPE): Description
@@ -202,7 +229,7 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj) if humanize else obj
+        self.text = self._humanize(obj, **kwargs) if humanize else obj
         self.prefix = prefix if use_prefix else ""
         self.theme = theme
         self.transform = transform
@@ -215,7 +242,8 @@ class Console():
             transform=None,
             use_prefix=True,
             prefix="Info",
-            humanize=True):
+            humanize=True,
+            **kwargs):
         """
         Args:
             obj (TYPE): Description
@@ -228,7 +256,7 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj) if humanize else obj
+        self.text = self._humanize(obj, **kwargs) if humanize else obj
         self.prefix = prefix if use_prefix else ""
         self.theme = theme
         self.transform = transform
@@ -241,7 +269,8 @@ class Console():
             transform=None,
             use_prefix=True,
             prefix="Warning",
-            humanize=True):
+            humanize=True,
+            **kwargs):
         """
         Args:
             obj (TYPE): Description
@@ -254,7 +283,7 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj) if humanize else obj
+        self.text = self._humanize(obj, **kwargs) if humanize else obj
         self.prefix = prefix if use_prefix else ""
         self.theme = theme
         self.transform = transform
@@ -267,7 +296,8 @@ class Console():
             transform=None,
             use_prefix=True,
             prefix="Error",
-            humanize=True):
+            humanize=True,
+            **kwargs):
         """
         Args:
             obj (TYPE): Description
@@ -280,7 +310,7 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj) if humanize else obj
+        self.text = self._humanize(obj, **kwargs) if humanize else obj
         self.prefix = prefix if use_prefix else ""
         self.theme = theme
         self.transform = transform
@@ -294,7 +324,8 @@ class Console():
             use_prefix=False,
             prefix="Section",
             full_width=False,
-            humanize=True):
+            humanize=True,
+            **kwargs):
         """
         Args:
             obj (TYPE): Description
@@ -308,7 +339,7 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj) if humanize else obj
+        self.text = self._humanize(obj, **kwargs) if humanize else obj
         if transform and 'center' in transform:
             format_text = "> {:^{num}} <"
             extra_chars = 4
@@ -340,7 +371,7 @@ class Console():
         self.transform = transform
         return self._print()
 
-    def box(self, obj, theme="box", transform=None, humanize=True):
+    def box(self, obj, theme="box", transform=None, humanize=True, **kwargs):
         """
         Function: box
         Summary: InsertHere
@@ -358,7 +389,7 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj) if humanize else obj
+        self.text = self._humanize(obj, **kwargs) if humanize else obj
         line_sizes = [
             len(line)
             for line in self.text.split("\n")
@@ -392,7 +423,8 @@ class Console():
             theme="confirm",
             transform=None,
             humanize=True,
-            default=None):
+            default=None,
+            **kwargs):
         """
         Args:
             obj (None, optional): Description
@@ -411,14 +443,14 @@ class Console():
             raise ValueError("Default must be a boolean")
 
         if obj:
-            self.text = self._humanize(obj) if humanize else obj
+            self.text = self._humanize(obj, **kwargs) if humanize else obj
         else:
             self.text = _("Please confirm")
         answered = False
         self.text = "{} {}{} ".format(
             self.text,
             _("(y/n)"),
-            "[{}]".format(self._humanize(default)[0])
+            "[{}]".format(self._humanize(default, **kwargs)[0])
             if default is not None else "")
         self.transform = transform
         self.prefix = None
@@ -444,7 +476,8 @@ class Console():
             theme="choose",
             transform=None,
             humanize=True,
-            default=None):
+            default=None,
+            **kwargs):
         """
         Args:
             choices (TYPE): Description
@@ -480,7 +513,7 @@ class Console():
         for choice in choices:
             self.text += "{}. {}\n".format(
                 i,
-                self._humanize(choice) if humanize else choice
+                self._humanize(choice, **kwargs) if humanize else choice
             )
             i += 1
         answered = False
@@ -510,7 +543,8 @@ class Console():
                 pass
         return choices[int(ret) - 1]
 
-    def unitext(self, obj, theme=None, transform=None, humanize=True):
+    def unitext(self, obj, theme=None, transform=None,
+                humanize=True, **kwargs):
         """
         Function: unitext
         Summary: InsertHere
@@ -528,14 +562,16 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj) if humanize else obj
+        self.text = self._humanize(obj, **kwargs) if humanize else obj
+        if hasattr(str, 'decode'):
+            self.text = self.text.decode("utf-8")
         self.text = unidecode(self.text)
         self.theme = theme
         self.transform = transform
         self.prefix = False
         return self._print()
 
-    def slugify(self, obj, humanize=True):
+    def slugify(self, obj, humanize=True, **kwargs):
         """Summary
 
         Args:
@@ -545,14 +581,16 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj) if humanize else obj
+        self.text = self._humanize(obj, **kwargs) if humanize else obj
+        if hasattr(str, 'decode'):
+            self.text = self.text.decode("utf-8")
         self.text = unidecode(self.text)
         self.text = self.text.strip().replace(" ", "_")
         self.text = self.text.lower()
         return self.text
 
     def progress(self, count, total, prefix=_('Reading'), theme=None,
-                 suffix=_('Complete'), barLength=50):
+                 suffix=_('Complete'), barLength=50, **kwargs):
         """
         Args:
             count (TYPE): Description
@@ -605,7 +643,8 @@ class Console():
             humanize=True,
             validator=None,
             default=None,
-            required=False):
+            required=False,
+            **kwargs):
         """Summary
 
         Args:
@@ -623,7 +662,7 @@ class Console():
         Raises:
             ValueError: Description
         """
-        self.text = self._humanize(obj) if humanize else obj
+        self.text = self._humanize(obj, **kwargs) if humanize else obj
         self.theme = theme
         self.transform = transform
         self.prefix = None
@@ -637,8 +676,9 @@ class Console():
             return self.text
         else:
             answered = False
+            ask_text = ": "
             while not answered:
-                data = input("? ")
+                data = input(ask_text)
                 if required and not data and not default:
                     text = self.text
                     self.error(_("Value required"))
@@ -650,6 +690,8 @@ class Console():
                                 "Validator must be a function")
                         text = self.text
                         answered = validator(data)
+                        if not answered:
+                            ask_text = "Please answer again: "
                         self.text = text
                     else:
                         answered = True
@@ -664,7 +706,8 @@ class Console():
                theme="choose",
                humanize=True,
                question=None,
-               default=None):
+               default=None,
+               **kwargs):
         """Summary
 
         Args:
@@ -688,7 +731,7 @@ class Console():
             except (ValueError, IndexError):
                 raise ValueError("Select default not valid")
         options = [
-            self._humanize(item) if humanize else item
+            self._humanize(item, **kwargs) if humanize else item
             for item in obj
         ]
         phrases = []
@@ -753,3 +796,70 @@ class Console():
                 text[index + 1:]
             )
         return test_letter, new_text
+
+    def run(
+            self,
+            task,
+            title=None,
+            get_stdout=False,
+            run_stdout=False,
+            verbose=False,
+            silent=False,
+            use_prefix=True,
+            prefix="Cmd"):
+        """Run command in subprocess.
+
+        Args:
+            task (string): command to run
+            title (string, optional): title to be printed
+            get_stdout (bool, optional): return stdout from command
+            run_stdout (bool, optional): run stdout before command
+            verbose (bool, optional): show command in terminal
+            silent (bool, optional): occult stdout/stderr when running command
+
+        Return
+        ------
+            Bool or String: Task success or Task stdout
+
+        """
+        if title:
+            self.section(title)
+
+        try:
+            if run_stdout:
+                if verbose:
+                    self.info(task, use_prefix=use_prefix, prefix=prefix)
+                command = subprocess.check_output(task, shell=True)
+
+                if not command:
+                    print('An error occur. Task aborted.')
+                    return False
+
+                if verbose:
+                    self.info(command, use_prefix=use_prefix, prefix=prefix)
+                ret = subprocess.call(command, shell=True)
+
+            elif get_stdout is True:
+                if verbose:
+                    self.info(task, use_prefix=use_prefix, prefix=prefix)
+                ret = subprocess.check_output(task, shell=True)
+            else:
+                if verbose:
+                    self.info(task, use_prefix=use_prefix, prefix=prefix)
+                ret = subprocess.call(
+                    task if not silent else
+                    "{} >/dev/null".format(task),
+                    shell=True,
+                    stderr=subprocess.STDOUT)
+
+            if ret != 0 and not get_stdout:
+                return False
+        except BaseException:
+            return False
+
+        try:
+            ret = ret.decode('utf-8')
+        except AttributeError:
+            pass
+
+        return True if not get_stdout else ret
