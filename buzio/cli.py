@@ -156,10 +156,6 @@ class Console():
                     )
                     for i, key in enumerate(obj)
                 ])
-                ret = "\n".join([
-                    "{}: {}".format(key, self._humanize(obj[key], **kwargs))
-                    for key in obj
-                ])
             else:
                 ret = "\n".join([
                     "{}: {}".format(key, self._humanize(obj[key], **kwargs))

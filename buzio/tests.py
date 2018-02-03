@@ -84,6 +84,20 @@ class ConsoleClassTest(unittest.TestCase):
             "a: No\nb: 2018-02-02"
         )
 
+    def test_humanize_dictionary_with_counters(self):
+        """test_humanize_dictionary_with_counters."""
+        a = False
+        b = datetime.date(2018, 2, 2)
+        obj = {
+            "a": a,
+            "b": b
+        }
+        ret = self.instance._humanize(obj, show_counters=True)
+        self.assertEqual(
+            ret,
+            "(1) a: No\n(2) b: 2018-02-02"
+        )
+
     def test_print_with_prefix(self):
         """test_print_with_prefix."""
         self.instance.text = "Hello World"
@@ -140,10 +154,10 @@ class ConsoleClassTest(unittest.TestCase):
 
     def test_error(self):
         """test_error."""
-        ret = self.instance.warning("Hello World")
+        ret = self.instance.error("Hello World")
         self.assertEqual(
             ret,
-            "\x1b[33mWarning: Hello World\x1b[0m"
+            "\x1b[31mError: Hello World\x1b[0m"
         )
 
     def test_section(self):
@@ -220,6 +234,35 @@ class ConsoleClassTest(unittest.TestCase):
         self.assertEqual(
             self.instance._get_style(),
             Fore.RED
+        )
+
+    def test_confirm(self):
+        """test_confirm."""
+        self.instance.format_only = True
+        ret = self.instance.confirm()
+        self.assertEqual(
+            ret[0],
+            '\x1b[95mPlease confirm (y/n) \x1b[0m'
+        )
+
+    def test_choose(self):
+        """test_choose."""
+        self.instance.format_only = True
+        options = ["Apple", "Orange", "Banana"]
+        ret = self.instance.choose(options)
+        self.assertEqual(
+            ret[1],
+            '\x1b[93m2. Orange\x1b[0m'
+        )
+
+    def test_choose_with_default(self):
+        """test_choose_with_default."""
+        self.instance.format_only = True
+        options = ["Apple", "Orange", "Banana"]
+        ret = self.instance.choose(options, default="Apple")
+        self.assertEqual(
+            ret[-1],
+            '\x1b[93m\x1b[0m'
         )
 
     def test_ask(self):
