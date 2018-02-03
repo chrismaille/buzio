@@ -3,6 +3,7 @@
 import unittest
 import datetime
 from buzio.cli import Console
+from collections import OrderedDict
 from colorama import Fore
 
 
@@ -88,6 +89,7 @@ class ConsoleClassTest(unittest.TestCase):
         """test_humanize_dictionary_with_counters."""
         a = False
         b = datetime.date(2018, 2, 2)
+        obj = OrderedDict(["a", "b"])
         obj = {
             "a": a,
             "b": b
