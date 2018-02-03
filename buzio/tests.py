@@ -75,10 +75,7 @@ class ConsoleClassTest(unittest.TestCase):
         """test_humanize_dictionary."""
         a = False
         b = datetime.date(2018, 2, 2)
-        obj = {
-            "a": a,
-            "b": b
-        }
+        obj = OrderedDict([("a", a), ("b", b)])
         ret = self.instance._humanize(obj)
         self.assertEqual(
             ret,
@@ -89,11 +86,7 @@ class ConsoleClassTest(unittest.TestCase):
         """test_humanize_dictionary_with_counters."""
         a = False
         b = datetime.date(2018, 2, 2)
-        obj = OrderedDict(["a", "b"])
-        obj = {
-            "a": a,
-            "b": b
-        }
+        obj = OrderedDict([("a", a), ("b", b)])
         ret = self.instance._humanize(obj, show_counters=True)
         self.assertEqual(
             ret,
