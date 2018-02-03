@@ -212,16 +212,8 @@ class ConsoleClassTest(unittest.TestCase):
         ret = self.instance.progress(count=5, total=10)
         self.assertEqual(
             ret,
-            "\rReading |\xe2\x96\x88\xe2\x96\x88"
-            "\xe2\x96\x88\xe2\x96\x88\xe2\x96\x88"
-            "\xe2\x96\x88\xe2\x96\x88\xe2\x96\x88"
-            "\xe2\x96\x88\xe2\x96\x88\xe2\x96\x88"
-            "\xe2\x96\x88\xe2\x96\x88\xe2\x96\x88"
-            "\xe2\x96\x88\xe2\x96\x88\xe2\x96\x88"
-            "\xe2\x96\x88\xe2\x96\x88\xe2\x96\x88"
-            "\xe2\x96\x88\xe2\x96\x88\xe2\x96\x88"
-            "\xe2\x96\x88\xe2\x96\x88------------"
-            "-------------| 50.00% Complete "
+            "\rReading |█████████████████████████------"
+            "-------------------| 50.00% Complete "
         )
 
     def test_load_new_theme(self):
