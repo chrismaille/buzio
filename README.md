@@ -10,7 +10,7 @@ Welcome to Buzio's documentation!
 * Read the Docs: http://buzio.readthedocs.io/
 * Source Code: https://github.com/chrismaille/buzio
 
-Buzio_ is a python library tool for printing formatted text in terminal, similar to termcolor_ or colored_.
+**Buzio** is a python library tool for printing formatted text in terminal, similar to [termcolor](https://pypi.python.org/pypi/termcolor) or [colored](https://pypi.python.org/pypi/colored).
 
 ### Installing Buzio
 
@@ -32,14 +32,14 @@ The `formatStr` is also a instance of the `Console` class too, but instead of pr
 
 #### The default color themes:
 
-|Method            | Text Color            | Show Prefix|
-|------------------|-----------------------|------------|
-|console.box       |  Fore.CYAN            |   No       |
-|console.error     |  Fore.RED             |   Yes      |
-|console.info      |  Fore.CYAN            |   Yes      |
-|console.section   |  Fore.LIGHTYELLOW_EX  |   No       |
-|console.success   |  Fore.GREEN           |   Yes      |
-|console.warning   |  Fore.YELLOW          |   Yes      |
+|Method            | Text Color          |
+|------------------|---------------------|
+|console.box       |  Fore.CYAN          |
+|console.error     |  Fore.RED           |
+|console.info      |  Fore.CYAN          |
+|console.section   |  Fore.LIGHTYELLOW_EX|
+|console.success   |  Fore.GREEN         |
+|console.warning   |  Fore.YELLOW        |
 
 These colors are based in [colorama](https://pypi.python.org/pypi/colorama) constants.
 
@@ -125,8 +125,7 @@ You can use **Buzio** to run terminal commands (using Python `subprocess`) and g
     >>> from buzio import console
     >>> ret = console.run("echo HelloWorld!", get_stdout=True, verbose=True)
     Cmd: echo HelloWorld!
-    >>> print(ret)The colors are based in colo[rama con]()stants.
-
+    >>> print(ret)
     HelloWorld!
 ```
 
