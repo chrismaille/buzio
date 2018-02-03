@@ -1,5 +1,5 @@
 test:
-	nosetests -v --with-coverage --cover-package=buzio --cover-min-percentage=80
+	nosetests -v --with-coverage --cover-package=buzio --cover-min-percentage=70
 	# pydocstyle --match-dir=buzio
 	pycodestyle buzio/
 
