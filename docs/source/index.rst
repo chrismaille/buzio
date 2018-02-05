@@ -17,14 +17,15 @@ Welcome to Buzio's documentation!
 .. image:: https://readthedocs.org/projects/buzio/badge/?version=latest
 	:target: http://buzio.readthedocs.io/en/latest/?badge=latest
 	:alt: Documentation Status
-.. image:: https://api.codacy.com/project/badge/Grade/5a70e225a4744cbc828013eeb003f2d7    :target: https://www.codacy.com/app/chrismaille/buzio?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=chrismaille/buzio&amp;utm_campaign=Badge_Grade
+.. image:: https://api.codacy.com/project/badge/Grade/5a70e225a4744cbc828013eeb003f2d7
+    :target: https://www.codacy.com/app/chrismaille/buzio?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=chrismaille/buzio&amp;utm_campaign=Badge_Grade
 .. image:: https://api.codeclimate.com/v1/badges/c90dd31c86a382ce3d99/maintainability
    :target: https://codeclimate.com/github/chrismaille/buzio/maintainability
    :alt: Maintainability
 .. image:: https://requires.io/github/chrismaille/buzio/requirements.svg?branch=master
      :target: https://requires.io/github/chrismaille/buzio/requirements/?branch=master
      :alt: Requirements Status
-     
+
 This document will guide you how to install, configure and use Buzio_ in your projects.
 
 What is Buzio?
