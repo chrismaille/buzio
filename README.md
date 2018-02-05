@@ -1,6 +1,7 @@
 Welcome to Buzio's documentation!
 =================================
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ef794e9be1c641848981be696fda9685)](https://www.codacy.com/app/chrismaille/buzio?utm_source=github.com&utm_medium=referral&utm_content=chrismaille/buzio&utm_campaign=badger)
 [![PyPI](https://img.shields.io/pypi/v/nine.svg)](https://pypi.python.org/pypi/buzio)
 [![Build Status](https://travis-ci.org/chrismaille/buzio.svg?branch=master)](https://travis-ci.org/chrismaille/buzio)
 [![PyPI](https://img.shields.io/pypi/pyversions/buzio.svg)](https://pypi.python.org/pypi/buzio)
