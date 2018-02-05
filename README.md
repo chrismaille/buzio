@@ -1,11 +1,13 @@
 Welcome to Buzio's documentation!
 =================================
 
-[![PyPI](https://img.shields.io/pypi/v/nine.svg)](https://pypi.python.org/pypi/buzio)
+[![PyPI](https://img.shields.io/pypi/v/buzio.svg)](https://pypi.python.org/pypi/buzio)
 [![Build Status](https://travis-ci.org/chrismaille/buzio.svg?branch=master)](https://travis-ci.org/chrismaille/buzio)
 [![PyPI](https://img.shields.io/pypi/pyversions/buzio.svg)](https://pypi.python.org/pypi/buzio)
 [![Coverage Status](https://coveralls.io/repos/github/chrismaille/buzio/badge.svg?branch=master)](https://coveralls.io/github/chrismaille/buzio?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/buzio/badge/?version=latest)](http://buzio.readthedocs.io/en/latest/?badge=latest)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5a70e225a4744cbc828013eeb003f2d7)](https://www.codacy.com/app/chrismaille/buzio?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=chrismaille/buzio&amp;utm_campaign=Badge_Grade)
+[![Maintainability](https://api.codeclimate.com/v1/badges/c90dd31c86a382ce3d99/maintainability)](https://codeclimate.com/github/chrismaille/buzio/maintainability)
 
 * Read the Docs: http://buzio.readthedocs.io/
 * Source Code: https://github.com/chrismaille/buzio
