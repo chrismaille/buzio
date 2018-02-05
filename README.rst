@@ -1,7 +1,7 @@
 Welcome to Buzio's documentation!
 =================================
 
-.. image:: https://img.shields.io/pypi/v/nine.svg
+.. image:: https://img.shields.io/pypi/v/buzio.svg
    :target: https://pypi.python.org/pypi/buzio
 .. image:: https://travis-ci.org/chrismaille/buzio.svg?branch=master
     :target: https://travis-ci.org/chrismaille/buzio
