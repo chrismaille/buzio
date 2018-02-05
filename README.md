@@ -8,6 +8,7 @@ Welcome to Buzio's documentation!
 [![Documentation Status](https://readthedocs.org/projects/buzio/badge/?version=latest)](http://buzio.readthedocs.io/en/latest/?badge=latest)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5a70e225a4744cbc828013eeb003f2d7)](https://www.codacy.com/app/chrismaille/buzio?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=chrismaille/buzio&amp;utm_campaign=Badge_Grade)
 [![Maintainability](https://api.codeclimate.com/v1/badges/c90dd31c86a382ce3d99/maintainability)](https://codeclimate.com/github/chrismaille/buzio/maintainability)
+[![Requirements Status](https://requires.io/github/chrismaille/buzio/requirements.svg?branch=master)](https://requires.io/github/chrismaille/buzio/requirements/?branch=master)
 
 * Read the Docs: http://buzio.readthedocs.io/
 * Source Code: https://github.com/chrismaille/buzio

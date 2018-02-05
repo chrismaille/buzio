@@ -16,7 +16,10 @@ Welcome to Buzio's documentation!
 .. image:: https://api.codeclimate.com/v1/badges/c90dd31c86a382ce3d99/maintainability
    :target: https://codeclimate.com/github/chrismaille/buzio/maintainability
    :alt: Maintainability
-
+.. image:: https://requires.io/github/chrismaille/buzio/requirements.svg?branch=master
+     :target: https://requires.io/github/chrismaille/buzio/requirements/?branch=master
+     :alt: Requirements Status
+     
 * Read the Docs: http://buzio.readthedocs.io/
 * Source Code: https://github.com/chrismaille/buzio
 
