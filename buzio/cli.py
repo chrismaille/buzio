@@ -142,12 +142,16 @@ class Console():
             else:
                 ret = obj.isoformat()
         elif isinstance(obj, list) or isinstance(obj, tuple):
-            ret = ", ".join([
+            humanize_list = [
                 self._humanize(data, **kwargs)
                 for data in obj
-            ])
+            ]
+            if self.transform and 'breakline' in self.transform:
+                ret = "\n".join(humanize_list)
+            else:
+                ret = ", ".join(humanize_list)
         elif isinstance(obj, dict):
-            if kwargs.pop('show_counters', False):
+            if self.transform and 'show_counters' in self.transform:
                 ret = "\n".join([
                     "({}) {}: {}".format(
                         i + 1,
@@ -180,7 +184,10 @@ class Console():
             Description
         """
         if self.prefix:
-            self.text = "{}: {}".format(self.prefix, self.text)
+            if self.transform and 'breakline' in self.transform:
+                self.text = "{}:\n{}".format(self.prefix, self.text)
+            else:
+                self.text = "{}: {}".format(self.prefix, self.text)
 
         if self.transform:
             if 'title' in self.transform:
@@ -203,10 +210,18 @@ class Console():
             ]
 
         if not self.format_only:
-            print("\n".join(self.text), end="\n" if linebreak else "")
+            print("\n".join(self.text), end="\n" if linebreak else "" + "\n")
 
         string = "{}".format("\n" if linebreak else "")
-        return string.join(self.text)
+        return format(string.join(self.text))
+
+    def _run_style(self, obj, theme, transform,
+                   use_prefix, prefix, humanize, **kwargs):
+        self.transform = transform
+        self.text = self._humanize(obj, **kwargs) if humanize else obj
+        self.prefix = prefix if use_prefix else ""
+        self.theme = theme
+        return self._print()
 
     def success(
             self,
@@ -229,11 +244,8 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj, **kwargs) if humanize else obj
-        self.prefix = prefix if use_prefix else ""
-        self.theme = theme
-        self.transform = transform
-        return self._print()
+        return self._run_style(obj, theme, transform,
+                               use_prefix, prefix, humanize, **kwargs)
 
     def info(
             self,
@@ -256,11 +268,8 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj, **kwargs) if humanize else obj
-        self.prefix = prefix if use_prefix else ""
-        self.theme = theme
-        self.transform = transform
-        return self._print()
+        return self._run_style(obj, theme, transform,
+                               use_prefix, prefix, humanize, **kwargs)
 
     def warning(
             self,
@@ -283,11 +292,8 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj, **kwargs) if humanize else obj
-        self.prefix = prefix if use_prefix else ""
-        self.theme = theme
-        self.transform = transform
-        return self._print()
+        return self._run_style(obj, theme, transform,
+                               use_prefix, prefix, humanize, **kwargs)
 
     def error(
             self,
@@ -310,11 +316,8 @@ class Console():
         Returns:
             TYPE: Description
         """
-        self.text = self._humanize(obj, **kwargs) if humanize else obj
-        self.prefix = prefix if use_prefix else ""
-        self.theme = theme
-        self.transform = transform
-        return self._print()
+        return self._run_style(obj, theme, transform,
+                               use_prefix, prefix, humanize, **kwargs)
 
     def section(
             self,
@@ -339,6 +342,7 @@ class Console():
         Returns:
             TYPE: Description
         """
+        self.transform = transform
         self.text = self._humanize(obj, **kwargs) if humanize else obj
         if transform and 'center' in transform:
             format_text = "> {:^{num}} <"
@@ -368,7 +372,6 @@ class Console():
         )
         self.prefix = prefix if use_prefix else ""
         self.theme = theme
-        self.transform = transform
         return self._print()
 
     def box(self, obj, theme="box", transform=None, humanize=True, **kwargs):
@@ -389,6 +392,7 @@ class Console():
         Returns:
             TYPE: Description
         """
+        self.transform = transform
         self.text = self._humanize(obj, **kwargs) if humanize else obj
         line_sizes = [
             len(line)
@@ -413,7 +417,6 @@ class Console():
             horizontal_line
         )
         self.theme = theme
-        self.transform = transform
         self.prefix = None
         return self._print()
 
@@ -442,6 +445,7 @@ class Console():
         if default is not None and not isinstance(default, bool):
             raise ValueError("Default must be a boolean")
 
+        self.transform = transform
         if obj:
             self.text = self._humanize(obj, **kwargs) if humanize else obj
         else:
@@ -452,7 +456,6 @@ class Console():
             _("(y/n)"),
             "[{}]".format(self._humanize(default, **kwargs)[0])
             if default is not None else "")
-        self.transform = transform
         self.prefix = None
         self.theme = theme
         self._print(linebreak=False)
@@ -508,6 +511,7 @@ class Console():
         else:
             default_index = None
 
+        self.transform = transform
         i = 1
         self.text = ""
         for choice in choices:
@@ -518,7 +522,6 @@ class Console():
             i += 1
         answered = False
         self.theme = theme
-        self.transform = transform
         self.prefix = False
         self._print()
         if self.format_only:
@@ -562,12 +565,12 @@ class Console():
         Returns:
             TYPE: Description
         """
+        self.transform = transform
         self.text = self._humanize(obj, **kwargs) if humanize else obj
         if hasattr(str, 'decode'):
             self.text = self.text.decode("utf-8")
         self.text = unidecode(self.text)
         self.theme = theme
-        self.transform = transform
         self.prefix = False
         return self._print()
 
@@ -662,9 +665,9 @@ class Console():
         Raises:
             ValueError: Description
         """
+        self.transform = transform
         self.text = self._humanize(obj, **kwargs) if humanize else obj
         self.theme = theme
-        self.transform = transform
         self.prefix = None
         self.text = "{}{}".format(
             self.text,
@@ -730,6 +733,7 @@ class Console():
                 obj[default]
             except (ValueError, IndexError):
                 raise ValueError("Select default not valid")
+        self.transform = None
         options = [
             self._humanize(item, **kwargs) if humanize else item
             for item in obj
@@ -746,7 +750,6 @@ class Console():
 
         answered = False
         self.theme = theme
-        self.transform = None
         self.prefix = False
         self.text = "{}: {}{}".format(
             question if question else _("Select"),
