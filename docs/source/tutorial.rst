@@ -56,7 +56,39 @@ The *Show Prefix* column tells if the text to be printed will be the section nam
 
     $ Success: Operation Complete
 
-You can control this behavior with the ``use_prefix`` paramenter. For example: ``console.info("Starting download...", use_prefix=False)```
+You can control this behavior with the ``use_prefix`` paramenter. For example: ``console.info("Starting download...", use_prefix=False)``` will print::
+
+    $ Starting download...
+
+Transforming text
++++++++++++++++++
+
+You can use the ``transform`` to format text:
+
+.. code-block:: python
+
+    >>> console.warning("Hello World", transform="upper")
+    Warning: HELLO WORLD
+    >>> console.warning("Hello World", transform="breakline")
+    Warning:
+    Hello World
+    >>> console.warning("Hello World", transform="upper linebreak")
+    Warning:
+    HELLO WORLD
+    >>> console.warning(["Hello", "World"], transform="breakline")
+    Warning:
+    Hello
+    World
+
+Current options for transform are:
+
+* ``upper``: UPPERTEXT
+* ``small``: lowertext
+* ``title``: Titletext
+* ``center``: horizontal centering text in terminal
+* ``breakline``: Break lines in text
+* ``bold``: Apply Style.BRIGHT effect in text
+* ``show_counters``: Add counters to text: 1) Hello 2) World (only for dicts and lists)
 
 The Input styles
 ----------------

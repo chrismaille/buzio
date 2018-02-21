@@ -6,6 +6,11 @@ from buzio.cli import Console
 from collections import OrderedDict
 from colorama import Fore
 
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+
 
 class BaseTest(unittest.TestCase):
     """Base Unit Tests Class."""
@@ -111,11 +116,11 @@ class ConsoleClassTest(BaseTest):
     def test_print_with_transform(self):
         """test_print_with_transform."""
         self.instance.text = "Hello World"
-        self.instance.transform = "upper"
+        self.instance.transform = "small"
         ret = self.instance._print()
         self.assertEqual(
             ret,
-            "HELLO WORLD"
+            "hello world"
         )
 
     def test_print_with_theme(self):
@@ -150,6 +155,24 @@ class ConsoleClassTest(BaseTest):
             ret,
             "\x1b[36mFirst Line\x1b[0m\x1b[36mSecond Line\x1b[0m"
         )
+
+    def test_load_new_theme(self):
+        """test_load_new_theme."""
+        new_theme = {
+            'test': Fore.RED
+        }
+        self.instance.load_theme(new_theme)
+        self.instance.theme = 'test'
+        self.assertEqual(
+            self.instance._get_style(),
+            Fore.RED
+        )
+
+    def test_load_wrong_theme(self):
+        """test_load_wrong_theme."""
+        new_theme = "ORANGE"
+        with self.assertRaises(ValueError):
+            self.instance.load_theme(new_theme)
 
 
 class StyleTestCase(BaseTest):
@@ -243,64 +266,57 @@ class StyleTestCase(BaseTest):
             "-------------------| 50.00% Complete "
         )
 
-    def test_load_new_theme(self):
-        """test_load_new_theme."""
-        new_theme = {
-            'test': Fore.RED
-        }
-        self.instance.load_theme(new_theme)
-        self.instance.theme = 'test'
-        self.assertEqual(
-            self.instance._get_style(),
-            Fore.RED
-        )
-
     def test_confirm(self):
         """test_confirm."""
-        self.instance.format_only = True
-        ret = self.instance.confirm()
-        self.assertEqual(
-            ret[0],
-            '\x1b[95mPlease confirm (y/n) \x1b[0m'
-        )
+        user_input = "y"
+        with patch('__builtin__.input', side_effect=user_input):
+            ret = self.instance.confirm()
+        self.assertTrue(ret)
 
     def test_choose(self):
         """test_choose."""
-        self.instance.format_only = True
         options = ["Apple", "Orange", "Banana"]
-        ret = self.instance.choose(options)
+        user_input = "2"
+        with patch('__builtin__.input', side_effect=user_input):
+            ret = self.instance.choose(options)
         self.assertEqual(
-            ret[1],
-            '\x1b[93m2. Orange\x1b[0m'
+            ret,
+            'Orange'
         )
 
     def test_choose_with_default(self):
         """test_choose_with_default."""
-        self.instance.format_only = True
         options = ["Apple", "Orange", "Banana"]
-        ret = self.instance.choose(options, default="Apple")
+        with patch('__builtin__.input'):
+            ret = self.instance.choose(options, default="Apple")
+
         self.assertEqual(
-            ret[-1],
-            '\x1b[93m\x1b[0m'
+            ret,
+            'Apple'
         )
 
     def test_ask(self):
         """test_ask."""
-        self.instance.format_only = True
-        ret = self.instance.ask('How many tests')
-        self.assertEqual(
-            ret[0],
-            '\x1b[33mHow many tests \x1b[0m'
-        )
+        def validate_answer(obj):
+            """Test validator for ask."""
+            return int(obj) == 3
+
+        user_input = "3"
+        with patch('__builtin__.input', side_effect=user_input):
+            ret = self.instance.ask(
+                'How many tests', validator=validate_answer)
+
+        self.assertEqual(ret, "3")
 
     def test_select(self):
         """test_select."""
-        self.instance.format_only = True
         options = ['orange', 'apples']
-        ret = self.instance.select(options)
+        user_input = "A"
+        with patch('__builtin__.input', side_effect=user_input):
+            ret = self.instance.select(options)
         self.assertEqual(
-            ret[0],
-            '\x1b[93mSelect: (O)range, (A)pples\x1b[0m'
+            options[ret],
+            'apples'
         )
 
     def test_run(self):
