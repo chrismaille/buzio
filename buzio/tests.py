@@ -7,13 +7,17 @@ from collections import OrderedDict
 from colorama import Fore
 
 
-class ConsoleClassTest(unittest.TestCase):
-    """Unit Tests for Console Class."""
+class BaseTest(unittest.TestCase):
+    """Base Unit Tests Class."""
 
     def setUp(self):
         """Set Up class."""
-        super(ConsoleClassTest, self).setUp()
+        super(BaseTest, self).setUp()
         self.instance = Console()
+
+
+class ConsoleClassTest(BaseTest):
+    """Unit Tests for Console Class."""
 
     def test_terminal_size(self):
         """test_terminal_size."""
@@ -87,7 +91,8 @@ class ConsoleClassTest(unittest.TestCase):
         a = False
         b = datetime.date(2018, 2, 2)
         obj = OrderedDict([("a", a), ("b", b)])
-        ret = self.instance._humanize(obj, show_counters=True)
+        self.instance.transform = "show_counters"
+        ret = self.instance._humanize(obj)
         self.assertEqual(
             ret,
             "(1) a: No\n(2) b: 2018-02-02"
@@ -122,6 +127,33 @@ class ConsoleClassTest(unittest.TestCase):
             ret,
             "\x1b[32mHello World\x1b[0m"
         )
+
+    def test_print_with_breaklines(self):
+        """test_print_with_breaklines."""
+        self.instance.text = "First Line\nSecond Line"
+        self.instance.theme = "info"
+        ret = self.instance._print()
+        self.assertEqual(
+            ret,
+            "\x1b[36mFirst Line\x1b[0m\x1b[36mSecond Line\x1b[0m"
+        )
+
+    def test_list_with_breaklines(self):
+        """test_list_with_breaklines."""
+        test_list = ["First Line", "Second Line"]
+        self.instance.theme = "info"
+        self.instance.transform = "breakline"
+        self.instance.text = self.instance._humanize(
+            obj=test_list)
+        ret = self.instance._print()
+        self.assertEqual(
+            ret,
+            "\x1b[36mFirst Line\x1b[0m\x1b[36mSecond Line\x1b[0m"
+        )
+
+
+class StyleTestCase(BaseTest):
+    """Unit Tests for Styles."""
 
     def test_success(self):
         """test_success."""
