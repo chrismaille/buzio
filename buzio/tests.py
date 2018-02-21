@@ -11,6 +11,12 @@ try:
 except ImportError:
     from mock import patch
 
+try:
+    import builtins
+    mock_input = 'builtins.input'
+except ImportError:
+    mock_input = '__builtin__.input'
+
 
 class BaseTest(unittest.TestCase):
     """Base Unit Tests Class."""
@@ -269,7 +275,7 @@ class StyleTestCase(BaseTest):
     def test_confirm(self):
         """test_confirm."""
         user_input = "y"
-        with patch('__builtin__.input', side_effect=user_input):
+        with patch(mock_input, side_effect=user_input):
             ret = self.instance.confirm()
         self.assertTrue(ret)
 
@@ -277,7 +283,7 @@ class StyleTestCase(BaseTest):
         """test_choose."""
         options = ["Apple", "Orange", "Banana"]
         user_input = "2"
-        with patch('__builtin__.input', side_effect=user_input):
+        with patch(mock_input, side_effect=user_input):
             ret = self.instance.choose(options)
         self.assertEqual(
             ret,
@@ -287,7 +293,7 @@ class StyleTestCase(BaseTest):
     def test_choose_with_default(self):
         """test_choose_with_default."""
         options = ["Apple", "Orange", "Banana"]
-        with patch('__builtin__.input'):
+        with patch(mock_input):
             ret = self.instance.choose(options, default="Apple")
 
         self.assertEqual(
@@ -302,7 +308,7 @@ class StyleTestCase(BaseTest):
             return int(obj) == 3
 
         user_input = "3"
-        with patch('__builtin__.input', side_effect=user_input):
+        with patch(mock_input, side_effect=user_input):
             ret = self.instance.ask(
                 'How many tests', validator=validate_answer)
 
@@ -312,7 +318,7 @@ class StyleTestCase(BaseTest):
         """test_select."""
         options = ['orange', 'apples']
         user_input = "A"
-        with patch('__builtin__.input', side_effect=user_input):
+        with patch(mock_input, side_effect=user_input):
             ret = self.instance.select(options)
         self.assertEqual(
             options[ret],
