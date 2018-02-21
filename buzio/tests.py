@@ -13,7 +13,8 @@ except ImportError:
 
 try:
     import builtins
-    mock_input = 'builtins.input'
+    if hasattr(builtins, 'input'):
+        mock_input = 'builtins.input'
 except ImportError:
     mock_input = '__builtin__.input'
 
