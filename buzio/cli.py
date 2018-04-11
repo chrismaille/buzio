@@ -204,7 +204,7 @@ class Console():
                     if self.transform and 'bold' in self.transform else "",
                     self._get_style(),
                     line,
-                    Style.RESET_ALL
+                    Style.NORMAL
                 )
                 for line in self.text.split("\n")
             ]
